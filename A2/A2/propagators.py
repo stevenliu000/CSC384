@@ -58,6 +58,8 @@ unassigned variable left
 
 '''
 
+from copy import deepcopy
+
 def prop_BT(csp, newVar=None):
     '''
     Do plain backtracking propagation. That is, do no propagation at all. Just 
@@ -86,7 +88,7 @@ def prop_FC(csp, newVar=None):
 
     for c in cs:
         if c.get_n_unasgn() == 1:
-            unasgn = c.get_n_unasgn()[0]
+            unasgn = c.get_unasgn_vars()[0]
             for d in unasgn.cur_domain():
                 unasgn.assign(d)
                 vars = c.get_scope()
@@ -109,5 +111,30 @@ def prop_GAC(csp, newVar=None):
     newVar on GAC Queue.
     '''
     # TODO! IMPLEMENT THIS!
+    prunes = []
+    GACQueue = []
+    if not newVar:
+        GACQueue = csp.get_all_cons()
+    else:
+        GACQueue = csp.get_cons_with_var(newVar)
+
+    while len(GACQueue) != 0:
+        c = GACQueue.pop(0)
+        for v in c.get_scope():
+            if not v.is_assigned():
+                curDom = deepcopy(v.cur_domain())
+                for d in curDom:
+                    if not c.has_support(v,d):
+                        prunes.append((v,d))
+                        v.prune_value(d)
+                        if v.cur_domain_size() == 0:
+                            GACQueue.clear()
+                            return (False, prunes)
+                        else:
+                            for cPrime in csp.get_cons_with_var(v):
+                                if cPrime not in GACQueue:
+                                    GACQueue.append(cPrime)
+
+    return (True, prunes)
 
     
