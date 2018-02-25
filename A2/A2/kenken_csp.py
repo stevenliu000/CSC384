@@ -38,17 +38,17 @@ import operator
 def binary_ne_grid(kenken_grid):
     # Initialize
     dim = kenken_grid[0][0]
-    vars = []
-    vars_1d = []
+    Vars = []
+    Vars_1d = []
     cons = []
 
     # construct list of lists of Variable objects 
     for i in range(dim):
-        vars.append([])
+        Vars.append([])
         for j in range(dim):
             var = Variable("Cell_r%i_c%i"%(i+1,j+1), domain = [z for z in range(1, dim+1)])
-            vars_1d.append(var)
-            vars[i].append(var)
+            Vars_1d.append(var)
+            Vars[i].append(var)
 
 
     # construct csp
@@ -57,7 +57,7 @@ def binary_ne_grid(kenken_grid):
             for k in range(j+1, dim):
 
                 #for row
-                con = Constraint("ConstraintRow_r%i_c%i_c%i"%(i+1,j+1,k+1), [vars[i][j],vars[i][k]])
+                con = Constraint("ConstraintRow_r%i_c%i_c%i"%(i+1,j+1,k+1), [Vars[i][j],Vars[i][k]])
                 tuples = []
                 for Tuple in permutations(list(range(1,dim+1)),2):
                     tuples.append(Tuple)
@@ -65,18 +65,18 @@ def binary_ne_grid(kenken_grid):
                 cons.append(con)
 
                 #for col
-                con = Constraint("ConstraintCol_c%i_r%i_r%i"%(i+1,j+1,k+1), [vars[j][i],vars[k][i]])
+                con = Constraint("ConstraintCol_c%i_r%i_r%i"%(i+1,j+1,k+1), [Vars[j][i],Vars[k][i]])
                 tuples = []
                 for Tuple in permutations(list(range(1,dim+1)),2):
                     tuples.append(Tuple)
                 con.add_satisfying_tuples(tuples)
                 cons.append(con)
 
-    csp = CSP("binary_ne_grid", vars_1d)
+    csp = CSP("binary_ne_grid", Vars_1d)
     for con in cons:
         csp.add_constraint(con)
 
-    return csp, vars
+    return csp, Vars
 
 
 
@@ -84,23 +84,23 @@ def binary_ne_grid(kenken_grid):
 def nary_ad_grid(kenken_grid):
     # Initialize
     dim = kenken_grid[0][0]
-    vars = []
-    vars_1d = []
+    Vars = []
+    Vars_1d = []
     cons = []
 
     # construct list of lists of Variable objects 
     for i in range(dim):
-        vars.append([])
+        Vars.append([])
         for j in range(dim):
             var = Variable("Cell_r%i_c%i"%(i+1,j+1), domain = [z for z in range(1, dim+1)])
-            vars_1d.append(var)
-            vars[i].append(var)
+            Vars_1d.append(var)
+            Vars[i].append(var)
 
     # construct csp
     for i in range(dim):
 
         #for row
-        con = Constraint("ConstraintRow_r%i"%i, vars[i])
+        con = Constraint("ConstraintRow_r%i"%i, Vars[i])
         tuples = []
         for Tuple in permutations(list(range(1, dim+1))):
             tuples.append(Tuple)
@@ -108,18 +108,18 @@ def nary_ad_grid(kenken_grid):
         cons.append(con)
 
         #for col
-        con = Constraint("ConstraintCol_r%i"%i, [(vars[row][i]) for row in range(n)])
+        con = Constraint("ConstraintCol_r%i"%i, [(Vars[row][i]) for row in range(n)])
         tuples = []
         for Tuple in permutations(list(range(1, dim+1))):
             tuples.append(Tuple)
         con.add_satisfying_tuples(tuples)
         cons.append(con)
 
-    csp = CSP("nary_ad_grid", vars_1d)
+    csp = CSP("nary_ad_grid", Vars_1d)
     for con in cons:
         csp.add_constraint(con)
 
-    return csp, vars
+    return csp, Vars
 
 
 
@@ -130,23 +130,23 @@ def kenken_csp_model(kenken_grid):
 
     # Initialize
     dim = kenken_grid[0][0]
-    vars = []
-    vars_1d = []
+    Vars = []
+    Vars_1d = []
     cons = []
 
     # construct list of lists of Variable objects 
     for i in range(dim):
-        vars.append([])
+        Vars.append([])
         for j in range(dim):
             var = Variable("Cell_r%i_c%i"%(i+1,j+1), domain = [z for z in range(1, dim+1)])
-            vars_1d.append(var)
-            vars[i].append(var)
+            Vars_1d.append(var)
+            Vars[i].append(var)
 
     # nary_ad_grid
     for i in range(dim):
 
         #for row
-        con = Constraint("ConstraintRow_r%i"%i, vars[i])
+        con = Constraint("ConstraintRow_r%i"%i, Vars[i])
         tuples = []
         for Tuple in permutations(list(range(1, dim+1))):
             tuples.append(Tuple)
@@ -154,7 +154,7 @@ def kenken_csp_model(kenken_grid):
         cons.append(con)
 
         #for col
-        con = Constraint("ConstraintCol_r%i"%i, [(vars[row][i]) for row in range(dim)])
+        con = Constraint("ConstraintCol_r%i"%i, [(Vars[row][i]) for row in range(dim)])
         tuples = []
         for Tuple in permutations(list(range(1, dim+1))):
             tuples.append(Tuple)
@@ -162,26 +162,26 @@ def kenken_csp_model(kenken_grid):
         cons.append(con)
 
     # construct kenken constraints
-    for idx, val in enumerate(kenken_grid[1:]):
-        if len(val) == 2:
-            con = Constraint("KenKen_%i"%idx, [(vars[(val[0]//10)-1][(val[0]%10)-1])])
-            tuples = [[val[1]]]
+    for idx, element in enumerate(kenken_grid[1:]):
+        if len(element) == 2:
+            con = Constraint("KenKen_%i"%idx, [(Vars[(element[0]//10)-1][(element[0]%10)-1])])
+            tuples = [[element[1]]]
 
         else:
-            con = Constraint("KenKen_%i"%idx, [(vars[(i//10)-1][(i%10)-1]) for i in val[:-2]])
+            con = Constraint("KenKen_%i"%idx, [(Vars[(i//10)-1][(i%10)-1]) for i in element[:-2]])
             tuples = []
 
-            for comb in product(list(range(1,dim+1)), repeat = (len(val)-2)):
-                if val[-1] == 0: 
+            for comb in product(list(range(1,dim+1)), repeat = (len(element)-2)):
+                if element[-1] == 0: 
                     oper = operator.add
-                elif val[-1] == 1: 
+                elif element[-1] == 1: 
                     oper = operator.sub 
-                elif val[-1] == 2: 
+                elif element[-1] == 2: 
                     oper = operator.truediv 
-                elif val[-1] == 3: 
+                elif element[-1] == 3: 
                     oper = operator.mul
 
-                if reduce(oper, comb) == val[-2]:
+                if reduce(oper, comb) == element[-2]:
                     for permu in permutations(comb):
                         if permu not in tuples:
                             tuples.append(permu)
@@ -189,8 +189,8 @@ def kenken_csp_model(kenken_grid):
         con.add_satisfying_tuples(tuples)
         cons.append(con)
 
-    csp = CSP("kenken_csp_model", vars_1d)
+    csp = CSP("kenken_csp_model", Vars_1d)
     for con in cons:
         csp.add_constraint(con)
 
-    return csp, vars
+    return csp, Vars

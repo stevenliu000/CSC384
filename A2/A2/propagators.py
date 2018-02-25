@@ -135,6 +135,8 @@ def prop_GAC(csp, newVar=None):
                                 if cPrime not in GACQueue:
                                     GACQueue.append(cPrime)
 
+                                    
     return (True, prunes)
+
 
     

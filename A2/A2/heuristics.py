@@ -45,9 +45,10 @@ def val_lcv(csp, var):
     inflexs = {}
 
     for val in vals:
-        var.assigned(val)
+        var.assign(val)
         cs = csp.get_cons_with_var(var)
         prunes = []
+        flag = False
 
         while len(cs) != 0:
             c = cs.pop(0)
@@ -57,15 +58,16 @@ def val_lcv(csp, var):
                     for d in curDom:
                         if not c.has_support(v,d):
                             prunes.append((v,d))
-                            v.prune_value()
+                            v.prune_value(d)
                             if v.cur_domain_size() == 0:
-                                GACQueue.clear()
-                                return (False, prunes)
+                                flag = True
+                                break
                             else:
                                 for cPrime in csp.get_cons_with_var(v):
                                     if cPrime not in cs:
                                         cs.append(cPrime)
-
+                if flag:
+                	break
         inflexs[val] = len(prunes)
 
         for a, b in prunes:
