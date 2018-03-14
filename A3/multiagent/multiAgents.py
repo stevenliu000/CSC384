@@ -335,6 +335,13 @@ def betterEvaluationFunction(currentGameState):
     scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
     capsules = currentGameState.getCapsules()
 
+    
+    if currentGameState.isWin():
+      return 10000000
+    if currentGameState.isLose():
+      return -10000000
+    
+
     # adding getScore()
     score += currentGameState.getScore()
 
@@ -349,7 +356,7 @@ def betterEvaluationFunction(currentGameState):
     for i in ghostPositions:
       dist = abs(position[0]-i[0])+abs(position[1]-i[1]+random.random())
       if scaredTimes[0] >= 5:
-        score += 2/dist
+        score += 3/dist
       else:
         if dist == 2:
           score -= 100000
